@@ -92,3 +92,24 @@ Choose one:
 5. Does the viewer leave with a genuinely better mental model?
 
 Be honest. Do not give the script a passing score just to please the user.
+
+
+## I. Mandatory editorial guardrails
+
+- [ ] The script feels like a story of discovery, not a sequence of definitions or a lecture.
+- [ ] The opening establishes a clear question and delivers on the title.
+- [ ] Unnecessary specialist jargon has been removed; essential terms are explained at first use.
+- [ ] A recurring analogy is coherent and its limits are clear, or there is a good reason not to use one.
+- [ ] The central example and chronology remain consistent throughout.
+- [ ] Spoken narration is direct and confident without overstating the evidence.
+- [ ] Secondary caveats are placed in concise notes where they do not need to interrupt narration.
+- [ ] The script includes a real demonstration or the strongest honest alternative.
+- [ ] Every displayed code sample, command, equation, and output has been checked; executable examples were run where practical.
+- [ ] Real outputs are distinguished from illustrative or conceptual visuals.
+- [ ] Abstract scenes contain a concrete visual payoff, example, comparison, or meaningful reveal.
+- [ ] Scene duration is justified by narration and visual action; no slow section is being hidden by timestamps.
+- [ ] Runtime was recalculated after the final revision.
+- [ ] A real table read was completed and timed, or the script explicitly says: "Table read pending — runtime is an estimate."
+- [ ] No test, recording, source check, or table read is claimed unless it actually happened.
+
+A critical failure means **REVISE** or **RESEARCH REQUIRED**, not READY.

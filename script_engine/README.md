@@ -2,6 +2,11 @@
 
 A reusable writing system for creating research-backed, engaging technology and science documentaries for **ETC — Exploring Technology & Computing**.
 
+
+## Mandatory editorial filter
+
+Before creating or approving any script, read `EDITORIAL_GUARDRAILS.md`. It applies to every ETC documentary and is enforced by the master instructions and quality checklist. It covers story versus lecture, jargon control, coherent analogies and examples, confident but accurate narration, real demonstrations, code/output verification, pacing, and honest table-read status.
+
 ## How to use
 
 Give the AI only:
@@ -28,6 +33,7 @@ Then ask the AI to follow `Who_to_write.md` and every relevant supporting file i
 | `RESEARCH_PROTOCOL.md` | Evidence standards, source hierarchy and claim verification |
 | `SCRIPT_FORMAT.md` | Required structure and formatting of the finished script |
 | `QUALITY_CHECKLIST.md` | Final editorial, factual and audience-retention review |
+| `EDITORIAL_GUARDRAILS.md` | Mandatory preflight and final filter for clarity, storytelling, demonstrations, consistency, pacing and integrity |
 | `INPUT_TEMPLATE.md` | Minimal user input format |
 
 ## Required output

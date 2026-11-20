@@ -1,8 +1,8 @@
 # ETC EPISODE 02 — HOW DOES CODE BECOME A RUNNING PROGRAM?
 
 **Revision:** 2 — revised after editorial review  
-**Target runtime:** 12–13 minutes  
-**Narration target:** approximately 1,400–1,500 words, with 45–75 seconds of intentional terminal demonstrations and visual-only beats  
+**Target runtime:** approximately 11 minutes  
+**Narration target:** approximately 1,250–1,300 words, with 45–75 seconds of intentional terminal demonstrations and visual-only beats  
 **Audience:** Curious general viewers; no programming background assumed  
 **Central question:** How does a line written by a human become an operation performed by a processor?  
 **Premise:** Follow one small C program — from source code to a running process — and watch a real compiler turn an addition into a processor instruction.  
@@ -142,15 +142,15 @@ This is a useful visual clue: the object file still refers to `printf`. The fina
 
 | Time | Chapter | Narrative purpose | Visual proof |
 |---|---|---|---|
-| 00:00–00:55 | The impossible journey | Create the mystery | Code on screen, then real terminal result |
-| 00:55–02:00 | One tiny program | Establish the only example and the kitchen analogy | Show the complete C program |
-| 02:00–03:20 | Preparing the order | Explain preprocessing and compiler work | Run GCC preprocessing and show output |
-| 03:20–05:25 | The translation | Reveal assembly and the real `add` instruction | Record `gcc -S`; highlight `addl` |
-| 05:25–06:35 | The unfinished package | Explain object files and linking | `nm -u main.o`; link the executable |
-| 06:35–08:10 | Opening the kitchen | Explain process creation and program loading | Launch program; show process/memory concept |
-| 08:10–10:15 | The processor does the work | Explain instruction, registers and addition | Disassemble executable; animate operands |
-| 10:15–11:20 | Where the working data lives | Explain registers, stack and memory without a jargon dump | Follow arguments and result |
-| 11:20–12:30 | From code to result | Reconstruct the whole path and resolve the mystery | One continuous end-to-end animation |
+| 00:00–00:50 | The impossible journey | Create the mystery | Code on screen, then real terminal result |
+| 00:50–01:50 | One tiny program | Establish the only example and the kitchen analogy | Show the complete C program |
+| 01:50–03:00 | Preparing the order | Explain preprocessing and compiler work | Run GCC preprocessing and show output |
+| 03:00–04:55 | The translation | Reveal assembly and the real `add` instruction | Record `gcc -S`; highlight `addl` |
+| 04:55–06:00 | The unfinished package | Explain object files and linking | `nm -u main.o`; link the executable |
+| 06:00–07:10 | Opening the kitchen | Explain process creation and program loading | Launch program; show process/memory concept |
+| 07:10–08:50 | The processor does the work | Explain instruction, registers and addition | Disassemble executable; animate operands |
+| 08:50–10:00 | Where the working data lives | Explain registers, stack and memory without a jargon dump | Follow arguments and result |
+| 10:00–11:00 | From code to result | Reconstruct the whole path and resolve the mystery | One continuous end-to-end animation |
 
 ---
 
@@ -158,7 +158,7 @@ This is a useful visual clue: the object file still refers to `printf`. The fina
 
 ## SCENE 01 — YOU PRESS RUN. WHAT ACTUALLY RUNS?
 
-**Timestamp:** 00:00–00:55
+**Timestamp:** 00:00–00:50
 
 **Narration:**
 
@@ -192,7 +192,7 @@ Start with a close-up of the Run button. Cut to the program's output: `5`. Rewin
 
 ## SCENE 02 — ONE ORDER, ONE PROGRAM
 
-**Timestamp:** 00:55–02:00
+**Timestamp:** 00:50–01:50
 
 **Narration:**
 
@@ -226,7 +226,7 @@ Show the corrected C source code in a clean editor. Highlight only the three imp
 
 ## SCENE 03 — THE COMPUTER PREPARES THE ORDER
 
-**Timestamp:** 02:00–03:20
+**Timestamp:** 01:50–03:00
 
 **Narration:**
 
@@ -270,7 +270,7 @@ Record a real terminal running the exact command. Show the file `main.i` appeari
 
 ## SCENE 04 — THE TRANSLATION: WATCH THE ADDITION CHANGE
 
-**Timestamp:** 03:20–05:25
+**Timestamp:** 03:00–04:55
 
 **Narration:**
 
@@ -332,7 +332,7 @@ Open `main.s`, find the `add` function, and highlight the exact line `addl %edx,
 
 ## SCENE 05 — THE OBJECT FILE IS STILL WAITING
 
-**Timestamp:** 05:25–06:35
+**Timestamp:** 04:55–06:00
 
 **Narration:**
 
@@ -378,7 +378,7 @@ Show `main.o` appearing. Run `nm -u main.o` and highlight `U printf`. Animate a 
 
 ## SCENE 06 — THE OPERATING SYSTEM OPENS THE WORKSPACE
 
-**Timestamp:** 06:35–08:10
+**Timestamp:** 06:00–07:10
 
 **Narration:**
 
@@ -414,7 +414,7 @@ Record launching `./main`. Freeze the terminal. Transition to a clean process di
 
 ## SCENE 07 — THE PROCESSOR FINALLY GETS TO WORK
 
-**Timestamp:** 08:10–10:15
+**Timestamp:** 07:10–08:50
 
 **Narration:**
 
@@ -464,7 +464,7 @@ Record `objdump -d main` and find the `<add>:` label. Highlight the actual `add`
 
 ## SCENE 08 — WHERE DOES THE PROGRAM KEEP ITS WORK?
 
-**Timestamp:** 10:15–11:20
+**Timestamp:** 08:50–10:00
 
 **Narration:**
 
@@ -498,7 +498,7 @@ Show the function call from `main` to `add`. Animate 2 and 3 entering the functi
 
 ## SCENE 09 — THE WHOLE JOURNEY
 
-**Timestamp:** 11:20–12:30
+**Timestamp:** 10:00–11:00
 
 **Narration:**
 
@@ -567,10 +567,10 @@ Return to the real terminal. Run `./main`. The output `5` appears. Pull back to 
 
 # 7. FINAL RUNTIME AND EDITORIAL CHECK
 
-- **Target runtime:** 12–13 minutes.
+- **Target runtime:** approximately 11 minutes.
 - **Narration delivery assumption:** approximately 125–135 words per minute.
-- **Narration target:** approximately 1,400–1,500 words; recount after the final spoken edit.
+- **Narration target:** approximately 1,250–1,300 words; the current draft is approximately 1,260 spoken words.
 - **Visual-only time:** approximately 45–75 seconds for terminal captures, pauses, and transformations.
-- **Runtime validation:** record a full read-through and time it. Do not infer exact duration from the outline.
+- **Runtime estimate:** approximately 10:30–11:15 at 125–135 words per minute plus the planned terminal and visual-only beats. Confirm with a timed read-through.
 - **Production proof:** record the actual GCC commands, generated assembly, unresolved-symbol output, disassembly, and program result.
-- **Editorial status:** REVISED DRAFT — the C string bug is corrected; the single-program narrative, analogy, real terminal proof, and jargon reduction are implemented. Final approval requires a timed read-through and local terminal capture on the creator's target machine.
+- **Editorial status:** REVISED DRAFT — the C string bug is corrected; the single-program narrative, recurring analogy, real terminal proof, and jargon reduction are implemented. Final approval requires a timed read-through and local terminal capture on the creator's target machine.

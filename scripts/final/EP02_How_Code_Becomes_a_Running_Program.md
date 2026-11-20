@@ -1,547 +1,538 @@
 # ETC EPISODE 02 — HOW DOES CODE BECOME A RUNNING PROGRAM?
 
-**Working title:** How Does Code Become a Running Program?  
-**Target duration:** 12 minutes 45 seconds (approx.)  
-**Estimated narration:** approximately 1,500 words, plus visual-only beats  
+**Revision:** 2 — revised after editorial review  
+**Target runtime:** 12–13 minutes  
+**Narration target:** approximately 1,400–1,500 words, with 45–75 seconds of intentional terminal demonstrations and visual-only beats  
 **Audience:** Curious general viewers; no programming background assumed  
-**Central question:** How does human-written source code become operations carried out by a processor?  
-**Premise:** Follow one small program through the software layers that translate, prepare, load, and execute it — while discovering why different programming languages take different routes.  
-**Viewer takeaway:** A program does not simply jump from readable text into the CPU. A language implementation, compiler or interpreter, linker, operating system, runtime, memory system, and processor architecture cooperate to make it run.
+**Central question:** How does a line written by a human become an operation performed by a processor?  
+**Premise:** Follow one small C program — from source code to a running process — and watch a real compiler turn an addition into a processor instruction.  
+**Single running example:** One C program that adds 2 and 3, then prints the result.  
+**Narrative analogy:** A restaurant order moving through a kitchen. Use it consistently as an explanatory analogy, never as a literal description of computer hardware.
 
 ---
 
 # 1. RESEARCH BRIEF
 
-## Core explanation
+## The actual path shown
 
-A computer program begins as source code written according to a programming language's rules. What happens next depends on the language and its implementation.
+This episode follows one concrete route: a small C program built with GCC on a Linux x86-64 system.
 
-For a conventional native C program built with GCC, the familiar toolchain can include preprocessing, compilation, assembly, and linking. The linker combines object files and required library references into an executable or another output form.
+1. The programmer writes C source code.
+2. The C preprocessor handles directives such as `#include`.
+3. GCC compiles the program into assembly language.
+4. The assembler produces an object file containing machine-code sections and symbol information.
+5. The linker combines the program's object code and arranges references to external functions and libraries. In this example, `printf` is dynamically linked.
+6. The operating system starts a process from the executable and prepares its execution environment.
+7. The processor executes machine instructions; the program uses registers and memory while it runs.
+8. The program prints `5`.
 
-For the standard CPython implementation of Python, source code is compiled into Python bytecode. The CPython bytecode interpreter executes that bytecode. This is a different route from directly compiling a C source file into a native executable for the target platform.
+The exact output shown in the demo was produced in a Linux x86-64 environment using GCC 14.2.0. Assembly syntax and register names will differ across architectures, compiler versions, and options.
 
-An operating system then creates a process from an executable. On ELF-based systems, executable and shared-object files describe segments used to create a process image; dynamic linking can resolve references among program components. The operating system establishes the program's virtual address space and execution environment.
-
-At the processor level, machine instructions are encoded according to an instruction-set architecture (ISA). The CPU fetches instructions and performs the operations they specify. Registers hold values and state; instructions may also read and write memory. Real processors use sophisticated techniques such as pipelining, caching, speculation, and out-of-order execution, so a simple fetch/decode/execute animation is a teaching model, not a literal account of every modern CPU's internal timing.
-
-## Important distinctions and misconceptions to avoid
-
-- A programming language is not the same thing as one implementation of that language.
-- "Compiled" and "interpreted" are not mutually exclusive categories for every language implementation.
-- CPython compiles Python source to bytecode; its interpreter executes that bytecode. Python bytecode is not the same thing as the target CPU's native machine code.
-- A compiler may produce an intermediate representation or assembly rather than a final executable.
-- Assembly and machine code are related but not identical: assembly is a human-readable representation; machine instructions are encoded for a particular ISA.
-- Linking and loading are different operations.
-- An executable file is not simply copied in full into physical RAM. The operating system establishes a process image and virtual-memory mappings; details vary by OS and executable format.
-- The CPU does not understand Python, C, JavaScript, or human intention. It implements an instruction-set architecture.
-- "The CPU fetches, decodes, and executes one instruction at a time" is an oversimplification of modern processors. Use it only as a conceptual introduction, then qualify it.
-- Do not claim all languages or all computers follow the exact C/GCC or CPython paths shown here.
-
-## Main demonstration
-
-Use one tiny C program to demonstrate a native compilation pipeline, then contrast it with a tiny Python program running under CPython.
-
-C example:
+## Single program used throughout
 
 ```c
 #include <stdio.h>
 
+int add(int a, int b) {
+    return a + b;
+}
+
 int main(void) {
-    int result = 2 + 3;
+    int result = add(2, 3);
     printf("%d\\n", result);
     return 0;
 }
 ```
 
-Build command:
+**Bug check:** The format string must contain the C escape sequence `\n` — one backslash followed by n. Do not place two backslashes before n in the actual C source.
+
+## Verified real demonstration
+
+Environment used for the captured sample:
+
+- GCC 14.2.0
+- Debian GNU/Linux environment
+- x86-64 target
+- Build at `-O0` for a readable, unoptimised teaching example
+
+Commands:
 
 ```bash
-gcc main.c -o main
+gcc --version
+gcc -E main.c -o main.i
+gcc -S -O0 main.c -o main.s
+gcc -c -O0 main.c -o main.o
+nm -u main.o
+gcc -O0 main.c -o main
+./main
+objdump -d main
 ```
 
-Python example:
+Observed output:
 
-```python
-def add(a, b):
-    return a + b
-
-print(add(2, 3))
+```text
+$ ./main
+5
 ```
 
-Keep the explanation conceptual. Do not claim every compiler emits identical assembly or that every Python implementation behaves exactly like CPython.
+Relevant real assembly from `main.s`:
+
+```asm
+add:
+    movl    %edi, -4(%rbp)
+    movl    %esi, -8(%rbp)
+    movl    -4(%rbp), %edx
+    movl    -8(%rbp), %eax
+    addl    %edx, %eax
+    popq    %rbp
+    ret
+```
+
+Relevant disassembly from the linked executable:
+
+```asm
+1143: 8b 55 fc    mov    -0x4(%rbp),%edx
+1146: 8b 45 f8    mov    -0x8(%rbp),%eax
+1149: 01 d0       add    %edx,%eax
+114b: 5d          pop    %rbp
+114c: c3          ret
+```
+
+The important reveal is the `add` instruction. The C expression `a + b` has become an instruction encoded for the target processor.
+
+The exact assembly is environment-specific. Record the terminal on the creator's own machine if the video is meant to show their actual setup. Label any supplied sample with its compiler and architecture.
+
+The object file reports an unresolved external symbol:
+
+```text
+$ nm -u main.o
+                 U printf
+```
+
+This is a useful visual clue: the object file still refers to `printf`. The final executable in this Linux example is dynamically linked. The static link step records the required dynamic-linking information; the dynamic loader participates when the program starts.
+
+## Key factual qualifications
+
+- This is one C/GCC/Linux example, not a universal pipeline for every programming language or operating system.
+- GCC's `-E`, `-S`, and `-c` options let us stop at preprocessing, assembly generation, and object-file creation respectively.
+- Assembly is a human-readable representation of instructions. The object file contains encoded machine instructions plus metadata and symbol/relocation information.
+- The linker connects program components. Dynamic linking can defer the actual loading and resolution of shared-library symbols until program startup.
+- The operating system creates a process and establishes its memory environment. A program is not simply copied wholesale into physical RAM.
+- The CPU executes instructions for its instruction-set architecture. The video will not teach the full architecture or microarchitecture.
+- The restaurant analogy is only a mental model. A compiler does not literally read a recipe, and a CPU does not literally cook.
 
 ---
 
 # 2. SOURCE REGISTER
 
-| ID | Source | Organisation | Use in this script |
+| ID | Source | Organisation | Use |
 |---|---|---|---|
-| S1 | [GCC — Overall Options](https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html) | GNU Project | GCC's preprocessing, compilation, assembly, and linking stages |
-| S2 | [GCC — Invoking GCC](https://gcc.gnu.org/onlinedocs/gcc/Invoking-GCC.html) | GNU Project | Normal GCC invocation and compilation pipeline |
-| S3 | [CPython — Compiler design](https://github.com/python/cpython/blob/main/InternalDocs/compiler.md) | Python / CPython project | CPython source-to-bytecode stages: tokenization, parsing, AST, control-flow graph, bytecode |
-| S4 | [Python — Execution model](https://docs.python.org/3/reference/executionmodel.html) | Python Documentation | Code blocks, execution frames, runtime and interpreter terminology |
-| S5 | [CPython — The bytecode interpreter](https://github.com/python/cpython/blob/main/InternalDocs/interpreter.md) | Python / CPython project | How CPython's bytecode interpreter executes code objects |
-| S6 | [System V ABI — Program Loading and Dynamic Linking](https://gabi.xinuos.com/elf/07-loading-intro.html) | Generic ABI documentation | Executable files, process images, segments, loading and dynamic linking |
-| S7 | [System V ABI — Program Loading](https://gabi.xinuos.com/elf/08-pheader.html) | Generic ABI documentation | Program headers and segments used to prepare a process image |
-| S8 | [System V ABI — Dynamic Linking](https://gabi.xinuos.com/elf/09-dynamic.html) | Generic ABI documentation | Dynamic linker and resolving symbolic references |
-| S9 | [Intel 64 and IA-32 Software Developer's Manuals](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html) | Intel | Processor architecture, programming environment, instruction set and execution resources |
-| S10 | [RISC-V Unprivileged ISA Specification](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf) | RISC-V International | Instruction fetch and instruction-defined memory operations; a separate ISA example |
+| S1 | [GCC 14.2 — Overall Options](https://gcc.gnu.org/onlinedocs/gcc-14.2.0/gcc/Overall-Options.html) | GNU Project | Meaning of `-E`, `-S`, and `-c` |
+| S2 | [GCC 14.2 — Preprocessor Options](https://gcc.gnu.org/onlinedocs/gcc-14.2.0/gcc/Preprocessor-Options.html) | GNU Project | Preprocessor behaviour |
+| S3 | [System V ABI — Program Loading](https://gabi.xinuos.com/elf/07-loading-intro.html) | Generic ABI | Executable loading and process image |
+| S4 | [System V ABI — Program Headers](https://gabi.xinuos.com/elf/08-pheader.html) | Generic ABI | ELF program segments |
+| S5 | [System V ABI — Dynamic Linking](https://gabi.xinuos.com/elf/09-dynamic.html) | Generic ABI | Dynamic linker and symbol resolution |
+| S6 | [Intel 64 and IA-32 Software Developer's Manuals](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html) | Intel | Instruction set and processor behaviour |
+| S7 | [GNU Binutils — objdump](https://sourceware.org/binutils/docs/binutils/objdump.html) | GNU Project | Disassembly of object files and executables |
+| S8 | [GNU Binutils — nm](https://sourceware.org/binutils/docs/binutils/nm.html) | GNU Project | Displaying symbols in object files |
 
 ---
 
 # 3. NARRATIVE OUTLINE
 
-| Time | Chapter | Purpose |
-|---|---|---|
-| 00:00–00:45 | The impossible gap | Create the mystery: readable code versus hardware operations |
-| 00:45–01:40 | The language humans write | Establish source code, language rules, and the machine's instruction set |
-| 01:40–02:45 | Before translation | Explain tokens, parsing, and program structure through CPython |
-| 02:45–04:50 | The compiler's journey | Demonstrate GCC's C pipeline |
-| 04:50–05:45 | Connecting the pieces | Explain object files, libraries, and linking |
-| 05:45–07:20 | Not every language takes the same road | Explain CPython bytecode and interpreter execution |
-| 07:20–08:35 | From file to process | Explain executable loading and the operating-system role |
-| 08:35–10:25 | The processor takes over | Explain ISA, instructions, registers, and execution |
-| 10:25–11:30 | Memory and the running program | Explain process memory and runtime state |
-| 11:30–12:45 | The whole journey | Reassemble the layers and resolve the opening question |
+| Time | Chapter | Narrative purpose | Visual proof |
+|---|---|---|---|
+| 00:00–00:55 | The impossible journey | Create the mystery | Code on screen, then real terminal result |
+| 00:55–02:00 | One tiny program | Establish the only example and the kitchen analogy | Show the complete C program |
+| 02:00–03:20 | Preparing the order | Explain preprocessing and compiler work | Run GCC preprocessing and show output |
+| 03:20–05:25 | The translation | Reveal assembly and the real `add` instruction | Record `gcc -S`; highlight `addl` |
+| 05:25–06:35 | The unfinished package | Explain object files and linking | `nm -u main.o`; link the executable |
+| 06:35–08:10 | Opening the kitchen | Explain process creation and program loading | Launch program; show process/memory concept |
+| 08:10–10:15 | The processor does the work | Explain instruction, registers and addition | Disassemble executable; animate operands |
+| 10:15–11:20 | Where the working data lives | Explain registers, stack and memory without a jargon dump | Follow arguments and result |
+| 11:20–12:30 | From code to result | Reconstruct the whole path and resolve the mystery | One continuous end-to-end animation |
 
 ---
 
 # 4. COMPLETE SCRIPT AND VISUAL TIMELINE
 
-## SCENE 01 — THE GAP BETWEEN CODE AND HARDWARE
+## SCENE 01 — YOU PRESS RUN. WHAT ACTUALLY RUNS?
 
-**Timestamp:** 00:00–00:45
+**Timestamp:** 00:00–00:55
 
 **Narration:**
 
-Look at these five characters.
+You write a few lines of code. You press Run. A moment later, your screen displays a result.
 
-`2 + 3`.
+It feels almost instant.
 
-To you, they are almost effortless to understand. You see two numbers and an operation. You already know the answer.
+But your computer has not simply looked at your code and understood what you meant.
 
-Now imagine asking a computer to do the same thing.
+There is a journey between those lines of text and the tiny electrical operations happening inside a processor.
 
-You could write a line of code. Press Run. And, almost instantly, the answer appears.
+And we can actually watch part of that journey.
 
-But look closer.
+Today, we're going to take one small program — one that adds two numbers and prints the answer — and follow it all the way from a source-code file to a running program.
 
-The processor inside your computer does not read Python or C the way you do. It does not look at a plus sign and understand addition as an idea.
+Not with a cartoon explanation.
 
-So what happens between the moment you write a line of code and the moment the computer actually performs the operation?
-
-There is an entire chain of software and hardware working behind that simple result.
+With a real compiler, real machine instructions, and a real result.
 
 **Visual direction:**
 
-Begin on a completely black screen. A cursor types `2 + 3`. The expression expands into a clean code editor. Camera pushes through the text, revealing a motherboard and CPU package. Freeze before reaching the chip. Then show the question: **HOW DOES CODE BECOME ACTION?**
+Start with a close-up of the Run button. Cut to the program's output: `5`. Rewind the image. The number travels backwards through a CPU, an executable file, assembly, and source code. Freeze on the original code.
 
-Do not show a fake literal stream of binary entering a CPU. The transition is conceptual.
+**On-screen text:** FROM CODE TO EXECUTION
 
-**On-screen text:** HOW DOES CODE BECOME ACTION?
+**Sound design:** One keyboard click. A short, restrained impact on the word "real". Music begins with a curious pulse.
 
-**Sound design:** A single keyboard tap, low restrained pulse, then a brief drop to silence before the central question.
-
-**Research references:** S9, S10.
+**Research references:** S1, S6, S7.
 
 ---
 
-## SCENE 02 — HUMANS WRITE LANGUAGES; MACHINES IMPLEMENT INSTRUCTIONS
+## SCENE 02 — ONE ORDER, ONE PROGRAM
 
-**Timestamp:** 00:45–01:40
+**Timestamp:** 00:55–02:00
 
 **Narration:**
 
-Programmers write instructions using programming languages.
+Here is our entire program.
 
-Languages such as C and Python give humans ways to express calculations, decisions, repetition, and data.
+It has one job: take the numbers two and three, add them, and print five.
 
-But a programming language is not the processor's native instruction set.
+Think of it like placing an order in a restaurant.
 
-A processor is designed around an instruction-set architecture — an agreed description of the instructions it can execute, the registers it exposes, and how those instructions interact with memory.
+You write the order in a language you understand. But the person who receives it cannot simply turn your handwriting into a finished meal. The order has to pass through a kitchen, where each person and each station has a specific job.
 
-That architecture is specific. An instruction encoded for one processor architecture is not automatically understood by another.
+A computer program follows a similar chain.
 
-This creates a translation problem.
+Our source code is the order. The compiler prepares instructions for a particular kind of machine. Other tools connect the pieces. The operating system prepares a place for the program to run. And finally, the processor carries out the instructions.
 
-The code must be processed by software that understands the programming language and knows how to produce something the target system can use.
+The analogy isn't literal, but it gives us a map.
 
-And that software is not always the same kind of tool.
+Let's follow this one program.
 
 **Visual direction:**
 
-Split the frame. Left: readable C and Python code. Right: an abstract instruction-set reference and a processor block diagram. In the middle, show a software toolchain as a bridge. Label the ISA as the contract between machine instructions and processor design.
+Show the corrected C source code in a clean editor. Highlight only the three important parts: `add`, `printf`, and `main`. Beside it, introduce a minimal restaurant-kitchen diagram: order → preparation → station setup → work being carried out. Keep this same visual metaphor available as a small recurring motif throughout the video.
 
-**On-screen text:** SOURCE CODE → LANGUAGE IMPLEMENTATION → MACHINE EXECUTION
+**On-screen text:** ONE PROGRAM. ONE JOURNEY.
 
-**Sound design:** A quiet mechanical rhythm begins as the bridge forms.
+**Sound design:** Quiet kitchen ambience blends into a subtle electronic rhythm.
 
-**Research references:** S9, S10.
+**Research references:** S1.
 
 ---
 
-## SCENE 03 — BEFORE A PROGRAM CAN BE TRANSLATED
+## SCENE 03 — THE COMPUTER PREPARES THE ORDER
 
-**Timestamp:** 01:40–02:45
-
-**Narration:**
-
-Before a language implementation can do anything useful with source code, it has to work out what that code means according to the language's rules.
-
-Let's use Python as an example.
-
-Imagine writing:
-
-`print(2 + 3)`
-
-The implementation does not simply search for familiar words and guess what you intended.
-
-A compiler front end first breaks the source into meaningful pieces called tokens. These tokens are then parsed according to the language grammar.
-
-The result can be represented as a structured form called an abstract syntax tree.
-
-Think of it as a map of the program's structure.
-
-The implementation can now distinguish the function call from the addition inside it. It can reason about the relationships between the pieces instead of treating the source as one long string of characters.
-
-In CPython, this process continues through compiler stages that eventually produce Python bytecode.
-
-But bytecode is not yet the processor's native instruction set.
-
-That distinction will matter in a moment.
-
-**Visual direction:**
-
-Show `print(2 + 3)` as text. Highlight tokens one by one: `print`, parentheses, `2`, plus, `3`. Rearrange them into a simple tree: function call → addition → two values. Then transform the tree into a compact bytecode-like visual. Clearly label the diagram **CONCEPTUAL — CPYTHON COMPILATION**; do not invent exact bytecode instructions.
-
-**On-screen text:** SOURCE → TOKENS → STRUCTURE → BYTECODE
-
-**Sound design:** Subtle clicks as tokens separate; soft tonal movement as the syntax tree forms.
-
-**Research references:** S3, S4.
-
----
-
-## SCENE 04 — THE C COMPILER: A DIFFERENT ROUTE
-
-**Timestamp:** 02:45–04:50
+**Timestamp:** 02:00–03:20
 
 **Narration:**
 
-Now let's follow a different path.
+Before the compiler translates our program, the first step is preparation.
 
-This time, we will use C and the GNU Compiler Collection, better known as GCC.
+Look at the very first line:
 
-Here is a tiny program:
+`#include <stdio.h>`
 
-```c
-#include <stdio.h>
+It tells the C preprocessor to bring in the declarations from the standard input and output header.
 
-int main(void) {
-    int result = 2 + 3;
-    printf("%d\\n", result);
-    return 0;
-}
-```
+In our restaurant analogy, this is like attaching the instruction sheet for a service the kitchen will need.
 
-When we run a command such as:
+The preprocessor handles that instruction before the main compilation work.
 
-`gcc main.c -o main`
+We can see it ourselves.
 
-GCC can carry out several stages.
+Open the terminal and run:
 
-The first is preprocessing.
+`gcc -E main.c -o main.i`
 
-The preprocessor handles directives such as the include line in our example. It expands the source according to preprocessing rules, including bringing in declarations from included headers.
+Now we have a preprocessed file.
 
-Next comes compilation proper.
+It contains far more text than our original program, because the included header has been processed too.
 
-The compiler analyses the program and translates it into a lower-level representation. Depending on the compiler and options, this can involve optimisations and the generation of assembly language.
+That is the first reveal: the compiler does not simply take the exact few lines we typed and turn them directly into a finished application.
 
-Assembly is more closely related to the processor's instruction set, but it is still a human-readable representation.
-
-Then comes assembly.
-
-An assembler turns assembly instructions into an object file containing encoded machine instructions and other information needed by later stages.
-
-And this is important: an object file is not necessarily the finished program.
-
-It may still contain references to functions or data that have not yet been connected.
-
-The stages are not magic. They are a toolchain, with each component doing a specific job.
+The source goes through preparation first.
 
 **Visual direction:**
 
-Use the actual C source code on screen. Animate a pipeline with four clear stations:
+Record a real terminal running the exact command. Show the file `main.i` appearing. Open it briefly and search for `int main`. Do not scroll through pages of header declarations. Return to the kitchen analogy: the order now has the required reference sheet attached.
 
-1. **PREPROCESSOR** — show `#include <stdio.h>` expanding into a simplified header/declaration representation. Do not flood the screen with the entire real header.
-2. **COMPILER** — source structure becomes a clean assembly-style view.
-3. **ASSEMBLER** — assembly lines become bytes grouped into an object-file icon.
-4. **OBJECT FILE** — show a file labelled `main.o`.
+**On-screen text:** `gcc -E main.c -o main.i`
 
-Use the exact command `gcc main.c -o main` in a terminal-style inset. Explain that real outputs vary with compiler version, target architecture, and options.
-
-**On-screen text:** PREPROCESS → COMPILE → ASSEMBLE
-
-**Sound design:** Each stage gets one restrained mechanical transition. Keep narration dominant.
+**Sound design:** A paper-sheet movement, then a quiet confirmation tone.
 
 **Research references:** S1, S2.
 
 ---
 
-## SCENE 05 — WHY THE OBJECT FILE ISN'T THE END
+## SCENE 04 — THE TRANSLATION: WATCH THE ADDITION CHANGE
 
-**Timestamp:** 04:50–05:45
+**Timestamp:** 03:20–05:25
 
 **Narration:**
 
-Our object file contains machine instructions, but a complete program often depends on code that lives elsewhere.
+Now comes the part where the transformation becomes visible.
 
-In our example, the program calls `printf`.
+Our C code says:
 
-That function is provided by a library.
+`return a + b;`
 
-The linker connects the pieces. It combines object files, considers the libraries the program needs, and resolves references between them.
+A human understands that immediately.
 
-The result may be an executable file that the operating system can load.
+But the processor needs instructions encoded for its own architecture.
 
-There is a useful distinction here.
+Let's ask GCC to stop after generating assembly:
 
-Compilation translates code. Linking connects the program's components. Loading prepares a program to run.
+`gcc -S -O0 main.c -o main.s`
 
-They are related stages, but they are not the same operation.
+Open the file.
 
-And the file that comes out of the linker still has not performed the calculation on your screen.
+This is assembly language: a readable representation of low-level instructions.
 
-It is a prepared description of a program — not a running process.
+And look at this line:
+
+`addl %edx, %eax`
+
+There it is.
+
+The addition we wrote in C has become an instruction called `add`.
+
+The values are placed in processor registers. The instruction tells the processor to add one value to another and keep the result.
+
+This is the moment the mystery starts to become concrete.
+
+We began with:
+
+`a + b`
+
+And the compiler produced an instruction that the target processor understands.
+
+The kitchen order has been translated into a set of precise steps for this particular machine.
+
+But we are not finished. Assembly is still a readable representation. The machine needs the encoded instructions, not the words on the screen.
 
 **Visual direction:**
 
-Show `main.o` on the left and a library block on the right. Draw reference lines from the program's external function call to the library symbol. The linker assembles the connected pieces into an executable labelled `main`. Avoid implying that every library is copied into every executable; distinguish static and dynamic linking only visually as alternatives if needed.
+This is the major proof scene. Record the actual terminal:
 
-**On-screen text:** OBJECT FILES + LIBRARY REFERENCES → LINKER → EXECUTABLE
+`gcc -S -O0 main.c -o main.s`
 
-**Sound design:** Two separate rhythms resolve into one stable tone.
+Open `main.s`, find the `add` function, and highlight the exact line `addl %edx, %eax`. Animate the two incoming values entering two register blocks; the add instruction combines them. Use the actual captured output, not recreated pseudo-assembly. Add a small label: "GCC 14.2 · Linux x86-64 · -O0" if using the supplied sample; replace it with the creator's actual environment if recording locally.
 
-**Research references:** S1, S6, S8.
+**On-screen text:** `a + b` → `addl %edx, %eax`
+
+**Sound design:** Music drops back while the assembly line appears. One precise click as the two values combine.
+
+**Research references:** S1, S6.
 
 ---
 
-## SCENE 06 — PYTHON TAKES ANOTHER ROUTE
+## SCENE 05 — THE OBJECT FILE IS STILL WAITING
 
-**Timestamp:** 05:45–07:20
+**Timestamp:** 05:25–06:35
 
 **Narration:**
 
-So is that what happens to every program?
+The next tool is the assembler.
 
-No.
+It turns the assembly representation into an object file containing encoded machine instructions and information the next stage needs.
 
-Let's return to Python.
+Let's create one:
 
-In the standard CPython implementation, source code is compiled into Python bytecode. The bytecode interpreter then executes those instructions.
+`gcc -c -O0 main.c -o main.o`
 
-That means the word "interpreted" does not mean the source file is necessarily read as plain text, one character at a time, every time a line runs.
+Now inspect its unresolved symbols:
 
-There is a compilation step here too.
+`nm -u main.o`
 
-But Python bytecode is designed for the Python interpreter. It is not the same thing as native machine code for your processor.
+The terminal shows:
 
-The interpreter itself is software running on the computer. It is ultimately made of instructions that the processor can execute.
+`U printf`
 
-So when CPython runs your Python program, the processor executes the interpreter's native instructions. Those instructions implement the behaviour of the Python bytecode.
+That letter is telling us something useful: this object file still refers to a function called `printf`, but that reference has not been fully connected here.
 
-This is why the simple argument — compiled languages versus interpreted languages — can be misleading.
+Our program needs that function to display the answer.
 
-Different language implementations use different combinations of compilation, interpretation, virtual machines, and sometimes just-in-time compilation.
+This is where the linker comes in.
 
-The important question is not only, "What language is this?"
+Think of it as the station manager making sure the order is connected to the services it needs.
 
-It is also, "Which implementation is running it, and what execution strategy does that implementation use?"
+The linker produces the executable and records the information needed to connect dynamically linked libraries when the program starts.
+
+Now we have something the operating system can launch.
 
 **Visual direction:**
 
-Return to the Python example. Show source code becoming bytecode, then entering a clearly labelled **CPYTHON BYTECODE INTERPRETER**. Show the interpreter as a native application running on the operating system. Use two layers: Python bytecode instructions inside the interpreter; native CPU instructions underneath. Keep the two instruction sets visually distinct.
+Show `main.o` appearing. Run `nm -u main.o` and highlight `U printf`. Animate a cable connecting the program to the output-library service. Then run `gcc -O0 main.c -o main`. Show the executable file. Do not imply every library is copied directly into the executable; label this example as dynamically linked.
 
-**On-screen text:** PYTHON SOURCE → BYTECODE → CPYTHON INTERPRETER
+**On-screen text:** OBJECT FILE → LINKER → EXECUTABLE
 
-**Sound design:** A softer, more fluid sequence than the GCC pipeline. Briefly pause on the distinction between bytecode and machine code.
+**Sound design:** A small connection sound as the reference is resolved; no dramatic effects.
+
+**Research references:** S5, S8.
+
+---
+
+## SCENE 06 — THE OPERATING SYSTEM OPENS THE WORKSPACE
+
+**Timestamp:** 06:35–08:10
+
+**Narration:**
+
+We now have an executable file.
+
+But a file sitting on a drive is not yet a running program.
+
+When we launch it, the operating system prepares a process — a running instance of that program.
+
+Think of opening a kitchen station for a new order.
+
+The operating system sets up the space the program needs. It arranges the program's code and data in its memory environment, prepares the initial execution state, and makes sure the program can use the resources it needs.
+
+In this Linux example, the executable also relies on a dynamic loader to prepare its shared-library dependencies.
+
+There are several details hidden behind that one action, but the key idea is simple:
+
+The operating system turns the executable into a process that is ready to run.
+
+Now the processor has a program to execute.
+
+**Visual direction:**
+
+Record launching `./main`. Freeze the terminal. Transition to a clean process diagram: executable file → process container. Show code, data, stack, and shared-library regions as labelled blocks inside a virtual memory space. Keep technical labels on screen rather than narrating every term. This is a simplified Linux/ELF example, not a universal operating-system layout.
+
+**On-screen text:** EXECUTABLE → RUNNING PROCESS
+
+**Sound design:** A soft startup sound, then a stable rhythmic pulse.
 
 **Research references:** S3, S4, S5.
 
 ---
 
-## SCENE 07 — THE OPERATING SYSTEM CREATES A PROCESS
+## SCENE 07 — THE PROCESSOR FINALLY GETS TO WORK
 
-**Timestamp:** 07:20–08:35
+**Timestamp:** 08:10–10:15
 
 **Narration:**
 
-Let's return to the native executable we built with GCC.
+Now let's look at the processor.
 
-When you launch it, the operating system has a major job to do.
+It does not receive the C expression `a + b`.
 
-It must create a process — a running instance of the program — and prepare the environment in which it can execute.
+It receives machine instructions — encoded operations designed for its instruction set.
 
-On an ELF-based system, executable files contain information describing the segments needed to create a process image.
+Our assembly line was:
 
-The operating system uses that information to establish the program's memory layout.
+`addl %edx, %eax`
 
-The process receives a virtual address space. Its code, data, stack, and other regions are arranged according to the executable format and operating-system rules.
+The processor has small, extremely fast storage locations called registers. The values needed for this addition are placed there.
 
-If the program uses shared libraries, a dynamic linker may also need to load those libraries and resolve references before normal execution proceeds.
+The add instruction tells the processor to combine them.
 
-Notice what is happening.
+Two and three become five.
 
-The operating system is not asking the CPU to understand a file full of C code.
+We can inspect the finished executable too.
 
-It is preparing a process with the code and resources needed for execution.
+Run:
 
-And that process is kept separate from the process running another application.
+`objdump -d main`
+
+This tool displays the machine instructions in a readable assembly form.
+
+Find the `add` function.
+
+You can see the instruction encoded in the executable itself.
+
+So this is not an animation invented for the video. It is a real instruction in the program we just built.
+
+The processor follows instructions like these, along with many others, to make the program work.
 
 **Visual direction:**
 
-Show an executable file opening into a process container. Map labelled regions: **CODE**, **DATA**, **HEAP**, **STACK**. Show a shared library being mapped into the process as a separate component. Use a virtual-address-space diagram, not a literal physical RAM map. Label this as a simplified ELF/Linux-style example, not a universal layout for every operating system.
+Record `objdump -d main` and find the `<add>:` label. Highlight the actual `add` instruction and its bytes. Animate register A holding 2, register B holding 3, and the destination becoming 5. Label this register animation as a simplified explanation. Do not suggest that every CPU internally executes one instruction at a time; avoid the full microarchitecture detour.
 
-**On-screen text:** EXECUTABLE → PROCESS → VIRTUAL ADDRESS SPACE
+**On-screen text:** MACHINE INSTRUCTION → RESULT: 5
 
-**Sound design:** A controlled low-frequency build as the process container forms.
+**Sound design:** A tight, restrained pulse. A clean tonal resolution when 5 appears.
 
-**Research references:** S6, S7, S8.
+**Research references:** S6, S7.
 
 ---
 
-## SCENE 08 — NOW THE PROCESSOR CAN DO ITS WORK
+## SCENE 08 — WHERE DOES THE PROGRAM KEEP ITS WORK?
 
-**Timestamp:** 08:35–10:25
+**Timestamp:** 10:15–11:20
 
 **Narration:**
 
-Now we reach the hardware.
+A program needs more than instructions. It needs somewhere to keep the information it is working with.
 
-The processor does not receive the original line:
+Some values are held in registers inside the processor. Other values live in memory.
 
-`int result = 2 + 3;`
+Our function receives two numbers, uses them in the addition, and returns the result to the part of the program that called it.
 
-It executes machine instructions encoded for its instruction-set architecture.
+The program also needs to keep track of where it is in its work — which function is running, where to return, and what data is currently needed.
 
-At a conceptual level, the processor fetches an instruction, works out what the instruction means, and carries out the required operation.
+The operating system gives the process its own memory environment, while the processor moves values between registers and memory as the instructions require.
 
-Some instructions perform arithmetic. Others move data, compare values, change the flow of a program, or interact with memory.
+Think back to our kitchen.
 
-The processor has registers — very small, very fast storage locations inside the CPU — that hold values and execution state.
+The instructions are the order. The registers are the small working space right beside the chef. Main memory is the larger storage area nearby.
 
-An instruction might use values in registers, perform an addition, and place the result into another register.
-
-A different instruction might read data from memory or write a value back.
-
-This is the level at which the program's operations become real hardware activity.
-
-But there is one more important detail.
-
-Modern processors are far more sophisticated than a simple three-step animation suggests.
-
-They may overlap work, predict branches, execute operations out of order, and use several levels of cache to keep data close to the processor.
-
-The architecture defines the behaviour that software can rely on. The physical processor may use many internal techniques to achieve that behaviour efficiently.
-
-So the CPU is not translating your Python or C code.
-
-It is executing instructions that have already been prepared for the machine — directly, or as part of the interpreter that is running your program.
+The analogy is imperfect, but it helps explain why a running program needs both instructions and data.
 
 **Visual direction:**
 
-Begin with a conceptual instruction represented as an encoded bit pattern. Transition to a CPU diagram with three labelled conceptual stages: **FETCH**, **DECODE**, **EXECUTE**. Show a value moving through registers during an addition. Then widen the view to show a modern CPU pipeline with multiple operations overlapping. Add a clear note: "Conceptual model — modern CPUs are more complex." Avoid showing a literal single-file queue as if all processors execute one instruction at a time.
+Show the function call from `main` to `add`. Animate 2 and 3 entering the function, the addition, and 5 returning. Show registers as a small work surface and process memory as a larger storage area. Avoid exact latency claims or overly detailed memory hierarchy graphics.
 
-**On-screen text:** INSTRUCTION → PROCESSOR OPERATION
+**On-screen text:** INSTRUCTIONS + DATA + MEMORY
 
-**Sound design:** A restrained clock-like pulse becomes a layered, precise rhythm. Avoid exaggerated sci-fi effects.
+**Sound design:** Calm, steady music. A subtle return sound as the result moves back to `main`.
 
-**Research references:** S9, S10.
+**Research references:** S3, S6.
 
 ---
 
-## SCENE 09 — MEMORY IS PART OF THE STORY
+## SCENE 09 — THE WHOLE JOURNEY
 
-**Timestamp:** 10:25–11:30
-
-**Narration:**
-
-A running program is not just a list of instructions.
-
-It also needs data.
-
-Think about our small example. The program has a result to calculate, values to work with, and a function to call.
-
-Some values may be held temporarily in processor registers. Other data lives in memory.
-
-The operating system gives each process a virtual address space. The processor and memory-management hardware translate the addresses used by the program into locations in the system's memory hierarchy.
-
-That hierarchy includes CPU registers, caches, and main memory. Each level has different capacity, speed, and purpose.
-
-When a program asks for data, the processor may find it in a nearby cache, or it may need to access a lower level of the memory hierarchy.
-
-This is one reason performance is not simply about how many instructions a program contains.
-
-Where data lives, how often it is reused, and how the processor accesses it can make a major difference.
-
-The program is now a living process: instructions being executed, values being changed, memory being accessed, and the operating system managing the environment.
-
-**Visual direction:**
-
-Show a process with a small data value moving between a virtual address, memory hierarchy, cache, and CPU register. Keep the hierarchy qualitative; do not invent exact latency numbers. Show the result value changing from 2 and 3 to 5. Make clear that the diagram is conceptual.
-
-**On-screen text:** CODE + DATA + PROCESS STATE
-
-**Sound design:** Calm, steady pulse; subtle sound when the result changes.
-
-**Research references:** S7, S9, S10.
-
----
-
-## SCENE 10 — THE MOMENT A PROGRAM BECOMES REAL
-
-**Timestamp:** 11:30–12:45
+**Timestamp:** 11:20–12:30
 
 **Narration:**
 
-Let's return to where we started.
+Let's follow the journey one final time.
 
-A few characters on a screen.
+We wrote a C program.
 
-`2 + 3`.
+The preprocessor handled its included header. GCC translated the source into assembly. The assembler produced an object file. The linker connected the program with the library information it needed. The operating system started a process. And the processor executed the machine instructions.
 
-They look simple because the language hides the complexity from us.
+One small program. Several layers working together.
 
-But behind that simplicity is a chain of transformations and responsibilities.
+Other programming languages and platforms can take different routes. Some use bytecode and interpreters. Some use just-in-time compilation. Some produce native machine code in different ways.
 
-A language implementation analyses the source. A compiler or interpreter prepares it for execution. A linker may connect the program to other components. The operating system creates a process and prepares its memory environment. And the processor executes machine instructions that make the program's operations happen.
+But the underlying challenge is the same: turning instructions written by people into operations a machine can carry out.
 
-The exact path depends on the language, its implementation, the compiler or runtime, the operating system, and the processor architecture.
+So the next time you press Run and see a number appear, remember what happened behind that simple click.
 
-There is no single universal pipeline.
+Your code did not magically become a program.
 
-But the central idea is this:
-
-A computer does not magically understand the code we write.
-
-We build layers of software that translate our intentions into precise instructions — and layers of hardware that carry those instructions out.
-
-The next time you press Run, remember: the program you see is only the beginning of the story.
+It passed through a chain of tools, software, and hardware — until the processor could do the work.
 
 **Visual direction:**
 
-Reassemble the full chain from left to right:
+Create one continuous, clean pipeline using the same kitchen motif from Scene 2:
 
-**SOURCE CODE → LANGUAGE IMPLEMENTATION → COMPILER / INTERPRETER → LINKING / RUNTIME → OPERATING SYSTEM → PROCESSOR + MEMORY → OUTPUT**
+SOURCE CODE → PREPROCESSOR → COMPILER → ASSEMBLER → OBJECT FILE → LINKER → OPERATING SYSTEM → PROCESSOR → OUTPUT
 
-Show the original expression `2 + 3` again. The result **5** appears. Pull back to reveal the entire layered system behind it. End on a clean ETC title card.
+Return to the real terminal. Run `./main`. The output `5` appears. Pull back to reveal the complete pipeline behind it. End on ETC identity.
 
-**On-screen text:** CODE DOESN'T BECOME ACTION BY MAGIC. IT PASSES THROUGH LAYERS.
+**On-screen text:** FROM HUMAN CODE TO MACHINE EXECUTION
 
-**Sound design:** Resolve the music into a warm, understated final note. Leave a short pause before the ETC logo.
+**Sound design:** Bring back the opening music motif, now resolved. End with a short pause and ETC logo.
 
-**Research references:** S1–S10.
+**Research references:** S1–S8.
 
 ---
 
@@ -549,34 +540,37 @@ Show the original expression `2 + 3` again. The result **5** appears. Pull back 
 
 | Claim | Status | Qualification |
 |---|---|---|
-| GCC can perform preprocessing, compilation, assembly, and linking | Verified | Exact pipeline and output depend on invocation and options |
-| CPython compiles Python source into bytecode | Verified | This describes CPython; do not universalise to every Python implementation |
-| CPython's bytecode interpreter executes code objects | Verified | Interpreter internals evolve between versions |
-| Python bytecode is not native CPU machine code | Verified with qualification | The interpreter itself is native software executed by the processor |
-| ELF executable files describe segments used to create process images | Verified | Applies to ELF-based systems; not every OS uses ELF |
-| Dynamic linking resolves references among program components | Verified | Exact loader and linking behaviour is platform-dependent |
-| CPUs execute instructions defined by an ISA | Verified | Different processor architectures have different instruction sets |
-| A simple fetch/decode/execute sequence describes all modern CPU internals | Not stated as literal fact | Presented only as a conceptual model and explicitly qualified |
-| Programs use registers and memory during execution | Verified | Exact use and mapping depend on architecture and implementation |
-| Every language follows the same source-to-executable path | Rejected | Script explicitly explains implementation-specific routes |
+| GCC's `-E` stops after preprocessing | Verified | GCC documentation |
+| GCC's `-S` produces assembly and stops before assembly into an object file | Verified | GCC documentation |
+| GCC's `-c` produces object files without linking | Verified | GCC documentation |
+| The shown x86-64 assembly contains `addl %edx, %eax` | Verified by actual local build | GCC 14.2.0, Linux x86-64, `-O0`; not universal output |
+| `nm -u main.o` shows `printf` as an unresolved external symbol | Verified by actual local build | Exact output depends on object format and toolchain |
+| The example executable is dynamically linked | Verified by local `file` output | This specific Linux build |
+| The operating system creates a process from an executable | Verified | Details vary by operating system and executable format |
+| The processor executes encoded machine instructions | Verified | The ISA and microarchitecture differ by processor |
+| Every language follows this exact pipeline | Explicitly rejected | The example is C with GCC on Linux |
+
+---
 
 # 6. EDITORIAL NOTES
 
-- The documentary uses GCC and CPython as two concrete examples, not as universal models for all languages.
-- The C example is illustrative. Exact assembly and optimisation results vary by compiler version, target architecture, and build options.
-- The operating-system section uses ELF as a concrete executable-format example. It should be visually labelled as an ELF-based system, not as a description of every OS.
-- The fetch/decode/execute sequence is a conceptual teaching model. Modern processors overlap and reorder internal work while maintaining the architectural behaviour software relies on.
-- Avoid presenting binary streams, CPU diagrams, or memory layouts as literal photographs of internal activity.
-- If a real terminal demonstration is recorded, show the compiler command and the resulting executable on the actual target system. Do not imply that every platform uses the same command or file extension.
-- This script intentionally does not attempt to teach every compiler optimisation, linker relocation, operating-system scheduler, or CPU microarchitecture detail. Those subjects could each support their own episode.
+- The previous version's two-program structure has been removed. One C program is followed from beginning to end.
+- The restaurant-kitchen analogy is introduced once and carried through the explanation. It remains an analogy, not a literal hardware model.
+- Spoken jargon has been reduced. Technical labels such as object file, process, registers, and linker are introduced only when needed. Terms such as AST, ELF, ISA, and out-of-order execution are not required in narration.
+- The Python detour has been removed. Other language strategies are acknowledged briefly near the end without introducing a second program.
+- The C string is corrected to `printf("%d\\n", result);` in the actual source representation: exactly one backslash before n.
+- Real terminal captures should replace any recreated terminal visuals. If the creator's machine differs, record its actual compiler output and label the architecture and compiler version.
+- The sample assembly was produced with `-O0` for readability. Optimised builds may look substantially different.
+- The dynamic-linking explanation is deliberately concise. The linker records dynamic dependencies; the runtime loader participates in loading shared libraries and resolving symbols.
 
-# 7. FINAL RUNTIME CHECK
+---
 
-- **Target:** approximately 12:45.
-- **Narration speed assumption:** approximately 125–140 words per minute.
-- **Narration estimate:** approximately 1,500 words; recount and time a spoken recording before locking the edit.
-- **Visual-only moments:** approximately 30–45 seconds distributed across transitions and demonstrations.
-- **Expected finished runtime:** approximately 12–14 minutes, depending on delivery and edit pace.
-- **Runtime verdict:** Appropriate for the requested 10–15+ minute range. Do not add filler to reach a longer duration.
+# 7. FINAL RUNTIME AND EDITORIAL CHECK
 
-**Editorial status:** REVISE AFTER TABLE READ — the research basis and structure are prepared; record a timed read-through, validate every demonstration against the target toolchain, and perform the final spoken-word and citation audit before publication.
+- **Target runtime:** 12–13 minutes.
+- **Narration delivery assumption:** approximately 125–135 words per minute.
+- **Narration target:** approximately 1,400–1,500 words; recount after the final spoken edit.
+- **Visual-only time:** approximately 45–75 seconds for terminal captures, pauses, and transformations.
+- **Runtime validation:** record a full read-through and time it. Do not infer exact duration from the outline.
+- **Production proof:** record the actual GCC commands, generated assembly, unresolved-symbol output, disassembly, and program result.
+- **Editorial status:** REVISED DRAFT — the C string bug is corrected; the single-program narrative, analogy, real terminal proof, and jargon reduction are implemented. Final approval requires a timed read-through and local terminal capture on the creator's target machine.

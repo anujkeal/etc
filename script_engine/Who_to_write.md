@@ -58,6 +58,25 @@ Do not make the writing childish or oversimplified. Respect the viewer's intelli
 9. **Respect complexity.** Explain exceptions and uncertainty where they materially affect the truth.
 10. **Deliver the promised answer.** The ending must resolve the central question raised at the beginning.
 
+
+
+## 3A. MANDATORY EDITORIAL GUARDRAILS
+
+Before drafting and again before delivery, read `EDITORIAL_GUARDRAILS.md`. It is a mandatory filter for every subject, not an optional style guide.
+
+Apply its rules to the topic rather than mechanically forcing them:
+- Build a story with a clear question, progression, evidence, and payoff; do not deliver a lecture disguised as a documentary.
+- Reduce unexplained jargon and keep the explanation accessible to an intelligent non-specialist.
+- Use one coherent recurring analogy when it helps, and clearly state its limits.
+- Keep the promised example and process consistent from beginning to end.
+- Make narration direct and confident while preserving necessary factual qualifications.
+- Include a real, verifiable demonstration or the strongest honest alternative. Never invent footage, code output, tests, or evidence.
+- Verify every on-screen code sample and command; run it when practical and disclose the actual environment.
+- Recalculate pacing after revision. A word-count estimate is not a completed table read.
+- If the script has not actually been read aloud and timed, mark the table read as pending.
+
+A script that passes factual review but fails these editorial guardrails is not ready for production.
+
 ## 4. THE COMPLETE WORKFLOW
 
 Follow these stages in order. Do not skip research or fact-checking to save time.

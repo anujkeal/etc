@@ -113,3 +113,22 @@ Be honest. Do not give the script a passing score just to please the user.
 - [ ] No test, recording, source check, or table read is claimed unless it actually happened.
 
 A critical failure means **REVISE** or **RESEARCH REQUIRED**, not READY.
+
+
+## J. Narrative tension and retention stress test
+
+- [ ] The opening creates a specific unresolved question, puzzle, contradiction, event, or consequence.
+- [ ] The opening does not reveal the complete thesis and then spend the rest of the video repeating it.
+- [ ] The viewer has a clear reason to care before the technical explanation begins.
+- [ ] Real people, organisations, events, dates, decisions, or consequences are used where the subject supports them.
+- [ ] Anecdotes are verified, relevant, and connected to the central argument rather than added as trivia.
+- [ ] The script contains a concrete demonstration or evidence-led sequence, not merely logos and generic diagrams.
+- [ ] Where useful, a central demonstration compares the same task or traces the same process under clearly stated conditions.
+- [ ] The middle third introduces new evidence, complications, stories, mechanisms, or payoffs instead of restating the thesis.
+- [ ] Every scene earns its runtime; weak or repetitive scenes have been cut or combined.
+- [ ] Sentence lengths, paragraph shapes, and scene functions vary naturally.
+- [ ] Repetitive rhetorical questions, formulaic contrasts, and habitual transition phrases have been removed.
+- [ ] The requested runtime has not caused padding; a shorter runtime has been recommended if it produces a stronger documentary.
+
+**Retention test:** Summarise what genuinely new thing the viewer discovers in each chapter. If two consecutive chapters have essentially the same answer, restructure or cut one. If the opening already gives away the whole discovery, redesign the opening around the question, evidence, or event that makes the answer worth discovering.
+

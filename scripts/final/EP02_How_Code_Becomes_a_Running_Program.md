@@ -39,7 +39,7 @@ int add(int a, int b) {
 
 int main(void) {
     int result = add(2, 3);
-    printf("%d\\n", result);
+    printf("%d\n", result);
     return 0;
 }
 ```
@@ -558,7 +558,7 @@ Return to the real terminal. Run `./main`. The output `5` appears. Pull back to 
 - The restaurant-kitchen analogy is introduced once and carried through the explanation. It remains an analogy, not a literal hardware model.
 - Spoken jargon has been reduced. Technical labels such as object file, process, registers, and linker are introduced only when needed. Terms such as AST, ELF, ISA, and out-of-order execution are not required in narration.
 - The Python detour has been removed. Other language strategies are acknowledged briefly near the end without introducing a second program.
-- The C string is corrected to `printf("%d\\n", result);` in the actual source representation: exactly one backslash before n.
+- The C string is corrected to `printf("%d\n", result);` in the actual source representation: exactly one backslash before n.
 - Real terminal captures should replace any recreated terminal visuals. If the creator's machine differs, record its actual compiler output and label the architecture and compiler version.
 - The sample assembly was produced with `-O0` for readability. Optimised builds may look substantially different.
 - The dynamic-linking explanation is deliberately concise. The linker records dynamic dependencies; the runtime loader participates in loading shared libraries and resolving symbols.

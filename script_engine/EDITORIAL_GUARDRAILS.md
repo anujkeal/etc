@@ -126,3 +126,55 @@ Before delivery, run these checks against the final version, not an earlier draf
 - **Integrity:** Are all uncertainties, simulations, and unperformed checks disclosed?
 
 If a critical item fails, mark the script **REVISE** or **RESEARCH REQUIRED**. Do not label it production-ready to be agreeable.
+
+
+## 2A. Narrative tension, specificity, and retention
+
+A script can be accurate, clear, and logically organised yet still feel like a lecture. Do not mistake completeness for watchability. The viewer should experience a sequence of discoveries, not receive the conclusion followed by ten minutes of supporting definitions.
+
+### Build an unresolved question
+
+- Open with a concrete puzzle, contradiction, consequence, unusual event, surprising demonstration, or human story that makes the subject matter.
+- Do not reveal the full thesis or answer in the opening. Establish the question and stakes; let the explanation earn the answer.
+- Give the viewer enough context to understand why the question matters, but preserve a meaningful discovery for later.
+- Create honest tension from a real problem, constraint, conflict, failure, decision, or consequence. Never manufacture danger or exaggerate the evidence.
+- Each major section should change what the viewer understands, raise a more precise question, or pay off an earlier question.
+- Do not use artificial cliffhangers. Curiosity must be rewarded with substantive information.
+
+### Prefer specific stories over generic placeholders
+
+- Search for two or three strong, verifiable real-world stories, people, decisions, incidents, inventions, failures, or surprising applications when the topic supports them.
+- Prefer a named person, organisation, place, date, system, and consequence over generic phrases such as "imagine a company" or "scientists wanted".
+- Use anecdotes as evidence and narrative engines, not decorative trivia. Explain what happened, why it happened, and what it reveals about the central question.
+- Research the exact details and context. Do not repeat a viral anecdote, attribution, date, or causal explanation without checking it against reliable sources.
+- Do not force a fixed number of stories onto subjects that do not support them. One compelling, well-supported case is better than three weak ones.
+- Keep the number of examples manageable. Each story must deepen the central argument rather than become a tangent.
+
+### Make the mechanism visible
+
+- Identify the strongest demonstration that lets viewers see the idea work.
+- For programming and computing topics, prioritise real code, terminal output, interfaces, source documents, benchmarks, or a controlled side-by-side comparison when relevant and feasible.
+- If comparing technologies, demonstrate the same meaningful task or constraint across them. Explain what the comparison does and does not prove.
+- Verify every code sample and output. Label unexecuted examples as illustrative; never fabricate a terminal run or result.
+- Use logos only for identification. A sequence of logos, generic icons, abstract diagrams, or animated labels is not a substitute for showing the mechanism, event, evidence, or consequence.
+- When archival footage, documents, interfaces, or real objects exist and are relevant, use them to anchor the story. Label reconstructions and conceptual visuals honestly.
+
+### Vary the narration and scene rhythm
+
+- Vary sentence length, paragraph shape, and scene function. Use short lines for emphasis, not as the default rhythm for every paragraph.
+- Mix explanation with narrative scenes, demonstrations, evidence, consequences, and moments of reflection.
+- Avoid repetitive rhetorical questions and predictable templates such as repeated "It's not X, it's Y", "But here's the important part", or "Imagine..." openings.
+- Read transitions for natural spoken flow. Do not make every scene end with a formulaic tease.
+- Remove repeated explanations even when they use different wording. Each return to an idea must add a new layer, evidence, consequence, or resolution.
+
+### Stress-test the middle
+
+- The middle of the documentary is a common retention failure point. Review it separately, not just the opening and ending.
+- For every middle scene, state what new fact, story, demonstration, complication, or payoff it contributes.
+- Merge or cut scenes that merely restate the thesis, list examples, or repeat trade-offs already explained.
+- Introduce a meaningful escalation: a more difficult case, a surprising exception, a real consequence, or a test of the viewer's developing mental model.
+- Do not keep a chapter simply because it is technically relevant. Relevance is not enough; it must earn its runtime.
+- If the requested duration causes padding, recommend a shorter, stronger runtime rather than stretching the material.
+
+The goal is not relentless excitement. It is forward motion: each scene should make the viewer want the next piece because it changes or completes the picture.
+
